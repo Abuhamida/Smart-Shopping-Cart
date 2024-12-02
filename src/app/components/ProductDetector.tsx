@@ -38,7 +38,7 @@ const ProductDetector: React.FC = () => {
     try {
       const response = await axios({
         method: "POST",
-        url: "https://detect.roboflow.com/egyptian-market-products/2",
+        url: "https://detect.roboflow.com/egyptian-market-products/3",
         params: {
           api_key: "ZDMzYQ7098cCBloqZeJX", // Replace with your actual API key
         },

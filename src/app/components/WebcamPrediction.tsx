@@ -41,7 +41,7 @@ const RealTimeDetection: React.FC = () => {
 
     try {
       const response = await axios.post<Detection>(
-        "https://detect.roboflow.com/egyptian-market-products/2",
+        "https://detect.roboflow.com/egyptian-market-products/3",
         base64Image,
         {
           params: { api_key: "ZDMzYQ7098cCBloqZeJX" },
@@ -78,7 +78,7 @@ const RealTimeDetection: React.FC = () => {
 
   return (
     <div className="w-full flex flex-col justify-center px-10 ">
-      <h1 className="text-3xl text-background font-bold font-sans pb-10 absolute top-40 ">
+      <h1 className="text-3xl text-background font-bold font-sans pb-10 absolute top-44 ">
         Real-Time Product Detection
       </h1>
 
@@ -94,9 +94,9 @@ const RealTimeDetection: React.FC = () => {
             }}
           />
         </div>
-        <div className="w-full">
+        <div className="w-full flex flex-col justify-center items-center">
           {detection && (
-            <div className=" flex flex-col w-full justify-center items-start ">
+            <div className=" flex flex-col w-full justify-center items-center ">
               <h2 className="text-primary text-2xl font-bold font-sans">
                 Detected Class:
               </h2>
