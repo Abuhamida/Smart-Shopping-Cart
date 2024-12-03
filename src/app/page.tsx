@@ -34,9 +34,9 @@ export default function Home() {
           <p className="text-lg md:text-2xl mb-6">
             Experience seamless shopping with AI-powered carts.
           </p>
-          <button className="bg-background hover:bg-primary text-white font-bold py-3 px-8 rounded-md">
+          <Link href={'/predict'} className="bg-background hover:bg-primary text-white font-bold py-3 px-8 rounded-md">
             Try Free Demo
-          </button>
+          </Link>
         </motion.div>
       </motion.div>
 
