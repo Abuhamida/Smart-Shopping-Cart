@@ -44,7 +44,9 @@ const RealTimeDetection: React.FC = () => {
         "https://detect.roboflow.com/egyptian-market-products/3",
         base64Image,
         {
-          params: { api_key: "ZDMzYQ7098cCBloqZeJX" },
+          params: {
+            api_key: "K3DGLdydynKvl5fNNlxV",
+          },
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
         }
       );
@@ -64,7 +66,7 @@ const RealTimeDetection: React.FC = () => {
     setIsDetecting(true);
     const interval = setInterval(() => {
       detectProduct();
-    }, 2000); // Run every 2 seconds
+    }, 1000); // Run every 1 seconds
 
     return () => clearInterval(interval); // Cleanup on unmount
   };

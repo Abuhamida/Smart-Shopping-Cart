@@ -26,7 +26,8 @@ export default function Nav() {
   return (
     <div className='flex items-center justify-between p-4 bg-background text-white'>
         <div className='flex items-center gap-4 pl-10'>
-            <Image src='/images/logo.jpg' alt='logo' width={70} height={70} />
+            <Link href={'/'}><Image src='/images/logo.jpg' alt='logo' width={70} height={70} /></Link>
+            
         </div>
         <div className='flex items-center gap-10 justify-center w-full'>
             {links.map((link) => (

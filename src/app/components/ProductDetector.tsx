@@ -1,29 +1,17 @@
 "use client";
-
 import React, { useState, ChangeEvent } from "react";
 import axios from "axios";
 
 const ProductDetector: React.FC = () => {
-  const [image, setImage] = useState<string | null>(null); // Selected image
+  const [image, setImage] = useState<File | null>(null); // Store the file directly
   const [detectedClass, setDetectedClass] = useState<string | null>(null); // Detected class
   const [loading, setLoading] = useState<boolean>(false); // Loading state
 
-  // Convert the uploaded image to base64
-  const loadImageBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-    });
-  };
-
   // Handle image upload
-  const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const base64Image = await loadImageBase64(file);
-      setImage(base64Image); // Save the base64 image for preview
+      setImage(file); // Save the file directly
     }
   };
 
@@ -36,15 +24,19 @@ const ProductDetector: React.FC = () => {
 
     setLoading(true); // Set loading state
     try {
+      // Prepare the form data
+      const formData = new FormData();
+      formData.append("file", image);
+
       const response = await axios({
         method: "POST",
         url: "https://detect.roboflow.com/egyptian-market-products/3",
         params: {
-          api_key: "ZDMzYQ7098cCBloqZeJX", // Replace with your actual API key
+          api_key: "K3DGLdydynKvl5fNNlxV",
         },
-        data: image,
+        data: formData,
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "multipart/form-data",
         },
       });
 
@@ -65,7 +57,7 @@ const ProductDetector: React.FC = () => {
 
   return (
     <div className="w-full flex flex-col justify-center px-10 ">
-      <h1 className="text-3xl text-background font-bold font-sans pb-20 absolute top-40 ">
+      <h1 className="text-3xl text-background font-bold font-sans pb-20 absolute top-44 ">
         Product Detector Using Image
       </h1>
       <div className="flex justify-center items-center ">
@@ -73,7 +65,7 @@ const ProductDetector: React.FC = () => {
         <div className="h-[300px]">
           {image && (
             <img
-              src={image}
+              src={URL.createObjectURL(image)} // Preview the uploaded image
               alt="Uploaded Preview"
               width={300}
               className=" py-10 "
