@@ -1,7 +1,14 @@
-import React from 'react'
+import React from "react";
 
 export default function Footer() {
   return (
-    <div className='flex items-center justify-center p-4 bg-background text-white'>Copyright Delta Tanks &copy; 2024</div>
-  )
+    <footer className="bg-background text-white py-8">
+      <div className="max-w-6xl mx-auto text-center">
+        <p>
+          &copy; {new Date().getFullYear()} Smart Shopping Cart. All Rights
+          Reserved.
+        </p>
+      </div>
+    </footer>
+  );
 }

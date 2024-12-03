@@ -1,90 +1,152 @@
+"use client";
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
 import bg from "../../public/main-bg2.png";
+import { motion } from "motion/react";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen ">
-      <div className=" relative w-full h-[750px]">
-        <Image
-          alt="Mountains"
-          src={bg}
-          placeholder="blur"
-          quality={100}
-          fill
-          sizes="100vw"
-          style={{
-            objectFit: "cover",
-          }}
-        />
-        <div className=" absolute top-[50%] pl-10 text-white flex flex-col gap-4">
-          <h1 className="  text-4xl font-bold font-sans ">
-            Welcome to the Future of Shopping!
+    <div className="min-h-screen bg-gray-50 text-background mt-12">
+      {/* Hero Section */}
+      <motion.div
+        className="relative bg-cover bg-center h-screen flex items-center justify-center"
+        style={{
+          backgroundImage: `url('/main-bg3.png')`,
+        }}
+        initial={{ opacity: 0.5, x: 50, y: 0 }}
+        whileInView={{ opacity: 1, y: 0, x: 0 }}
+        transition={{ duration: 1.5, ease: "easeInOut" }}
+        viewport={{ once: true }}
+        
+      >
+        <motion.div
+          className="text-center text-white px-6"
+          initial={{ opacity: 0, x: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0, x: 0 }}
+          transition={{ duration: 1.5, ease: "easeInOut" }}
+          viewport={{ once: true }}
+        >
+          <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-4">
+            Welcome to the Future of Shopping
           </h1>
-          <h2 className=" text-2xl font-semibold font-sans">
-            Revolutionizing the Way You Shop
-          </h2>
-        </div>
-      </div>
-      <div className="flex flex-col min-h-[600px] justify-center items-start w-full px-10">
-        <h1 className="text-background text-xl font-semibold pb-5">
-          Experience the future of shopping with our
-          <span className="font-bold"> Smart Shopping Cart, </span>
-          designed to simplify and enhance your in-store experience.
-        </h1>
-        <div className="w-[200px] h-[2px] bg-primary relative top-28 -left-[74px] rounded-full rotate-90"></div>
-        <ul className=" list-disc px-12 leading-10 text-base pt-5">
-          <li className="text-primary text-3xl">
-            <div className="text-black text-xl">
-              Automated Item Recognition: Using advanced AI and computer vision,
-              the cart instantly identifies the products you add.
-            </div>
-          </li>
-          <li className="text-primary text-3xl">
-            <div className="text-black text-xl">
-              Real-Time Cost Calculation: Keep track of your total as you
-              shop—no surprises at checkout.
-            </div>
-          </li>
-          <li className="text-primary text-3xl">
-            <div className="text-black text-xl">
-              Seamless Checkout: Skip the lines with a hassle-free payment
-              process.
-            </div>
-          </li>
-          <li className="text-primary text-3xl">
-            <div className="text-black text-xl">
-              Navigation Assistance: Find products faster with in-store
-              navigation guidance.
-            </div>
-          </li>
-          <li className="text-primary text-3xl">
-            <div className="text-black text-xl">
-              Personalized Recommendations: Discover deals and products tailored
-              to your preferences.
-            </div>
-          </li>
-        </ul>
+          <p className="text-lg md:text-2xl mb-6">
+            Experience seamless shopping with AI-powered carts.
+          </p>
+          <button className="bg-background hover:bg-primary text-white font-bold py-3 px-8 rounded-md">
+            Try Free Demo
+          </button>
+        </motion.div>
+      </motion.div>
 
-        <div className="flex flex-col pt-20 ">
-          <h1 className="text-3xl font-bold font-sans">
-            Start Shopping Smarter Today!
-          </h1>
-          <h2 className="font-sans font-medium">
-            Let us make your shopping experience faster, easier, and more
-            enjoyable.{" "}
-            <Link
-              href={"/predict"}
-              className="text-primary hover:text-secondary"
-            >
-              {" "}
-              Try now
-            </Link>
-          </h2>
+      {/* Introduction Section */}
+      <section className="py-16 px-8 bg-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold mb-4">About Smart Shopping Cart</h2>
+          <p className="text-lg text-gray-600">
+            Our Smart Shopping Cart uses AI, IoT, and computer vision to
+            revolutionize the shopping experience. From real-time price
+            calculations to seamless checkout, it's the ultimate retail
+            solution.
+          </p>
         </div>
-      </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 bg-gray-100">
+        <div className="max-w-6xl mx-auto px-8">
+          <h2 className="text-3xl font-bold text-center mb-8">Key Features</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                title: "Real-Time Cost",
+                description:
+                  "Automatically calculates the total cost of items in your cart.",
+                icon: "/cost.png",
+              },
+              {
+                title: "Seamless Checkout",
+                description: "Skip the lines and pay directly via the cart.",
+                icon: "/icons/checkout.svg",
+              },
+              {
+                title: "Personalized Recommendations",
+                description:
+                  "Get tailored product suggestions based on your preferences.",
+                icon: "/icons/recommendations.svg",
+              },
+            ].map((feature, index) => (
+              <div
+                key={index}
+                className="p-6 bg-white shadow-lg rounded-md text-center"
+              >
+                <img
+                  src={feature.icon}
+                  alt={feature.title}
+                  className="w-16 h-32 mx-auto mb-4"
+                />
+                <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+                <p className="text-gray-600">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Video Section */}
+      <section className="py-16 px-8 bg-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold mb-4">
+            See the Smart Cart in Action
+          </h2>
+          <iframe
+            width="100%"
+            height="400"
+            src="https://www.youtube.com/embed/example-video"
+            title="Smart Cart Demo"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-16 bg-gray-100">
+        <div className="max-w-6xl mx-auto px-8 text-center">
+          <h2 className="text-3xl font-bold mb-8">What Our Customers Say</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {[
+              {
+                name: "Sarah J.",
+                comment:
+                  "The Smart Shopping Cart made my grocery trips so much faster and easier!",
+                photo: "/testimonials/sarah.jpg",
+              },
+              {
+                name: "John D.",
+                comment:
+                  "I love the personalized recommendations. They’re spot on!",
+                photo: "/testimonials/john.jpg",
+              },
+            ].map((testimonial, index) => (
+              <div
+                key={index}
+                className="p-6 bg-white shadow-lg rounded-md text-center"
+              >
+                <img
+                  src={testimonial.photo}
+                  alt={testimonial.name}
+                  className="w-16 h-16 rounded-full mx-auto mb-4"
+                />
+                <p className="italic text-gray-600">"{testimonial.comment}"</p>
+                <h4 className="text-lg font-bold mt-4">{testimonial.name}</h4>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
