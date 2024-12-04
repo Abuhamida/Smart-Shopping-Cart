@@ -3,7 +3,7 @@
 import React from "react";
 import RealTimeDetection from "../components/WebcamPrediction";
 import ProductDetector from "../components/ProductDetector";
-
+import { motion } from "motion/react";
 export default function Home(): JSX.Element {
   const [activeComponent, setActiveComponent] =
     React.useState<string>("realtime");
@@ -12,11 +12,32 @@ export default function Home(): JSX.Element {
     <div className="bg-gray-50 text-background min-h-screen pt-10">
       {/* Header Section */}
       <div className="bg-gradient-to-r from-background to-background/90 text-white py-16 text-center">
-        <h1 className="text-4xl font-bold mb-4">Smart Product Detection</h1>
-        <p className="text-lg">
+        <motion.h1
+          className="text-4xl font-bold mb-4"
+          initial={{ opacity: 0, x: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0, x: 0 }}
+          transition={{
+            duration: 1,
+            ease: "easeInOut",
+          }}
+          viewport={{ once: true }}
+        >
+          Smart Product Detection
+        </motion.h1>
+        <motion.p
+          className="text-lg"
+          initial={{ opacity: 0, x: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0, x: 0 }}
+          transition={{
+            duration: 1,
+            ease: "easeInOut",
+            delay: 0.2,
+          }}
+          viewport={{ once: true }}
+        >
           Choose between real-time detection or upload an image to identify
           products instantly.
-        </p>
+        </motion.p>
       </div>
 
       {/* Navigation Buttons */}

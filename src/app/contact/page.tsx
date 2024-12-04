@@ -1,5 +1,5 @@
 "use client";
-
+import { motion } from "motion/react";
 import React, { useState } from "react";
 
 export default function page() {
@@ -17,11 +17,32 @@ export default function page() {
     <div className="pt-10 w-full flex flex-col justify-center items-center">
       {/* Header Section */}
       <div className="bg-gradient-to-r from-background to-background/90 text-white py-16 text-center w-full">
-        <h1 className="text-4xl font-bold mb-4">Get in Touch</h1>
-        <p className="text-lg">
+        <motion.h1
+          className="text-4xl font-bold mb-4"
+          initial={{ opacity: 0, x: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0, x: 0 }}
+          transition={{
+            duration: 1,
+            ease: "easeInOut",
+          }}
+          viewport={{ once: true }}
+        >
+          Get in Touch
+        </motion.h1>
+        <motion.p
+          className="text-lg"
+          initial={{ opacity: 0, x: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0, x: 0 }}
+          transition={{
+            duration: 1,
+            ease: "easeInOut",
+            delay: 0.2,
+          }}
+          viewport={{ once: true }}
+        >
           We’d love to hear from you! Contact us for inquiries, feedback, or
           support.
-        </p>
+        </motion.p>
       </div>
       <div className="max-w-screen-xl mt-10 px-8 grid gap-8 grid-cols-1 md:grid-cols-2 md:px-12 lg:px-16 xl:px-32 py-16 mx-auto bg-gray-100 text-gray-900 rounded-lg shadow-lg">
         <div className="flex flex-col justify-between">

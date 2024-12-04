@@ -15,7 +15,7 @@ export default function Home() {
         style={{
           backgroundImage: `url('/main-bg3.png')`,
         }}
-        initial={{ opacity: 0.5, x: -50, y: 0 }}
+        initial={{ opacity: 0.5, x: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0, x: 0 }}
         transition={{ duration: 1.5, ease: "easeInOut" }}
         viewport={{ once: true }}

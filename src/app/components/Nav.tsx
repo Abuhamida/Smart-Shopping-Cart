@@ -3,9 +3,30 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-
+import { usePathname } from "next/navigation";
+import { li } from "motion/react-m";
 export default function Nav() {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  const links = [
+    {
+      href: "/",
+      name: "Home",
+    },
+    {
+      href: "/about",
+      name: "About",
+    },
+    {
+      href: "/predict",
+      name: "Predict",
+    },
+    {
+      href: "/contact",
+      name: "Contact",
+    },
+  ];
 
   return (
     <nav className="bg-background text-white fixed top-0 w-full z-10 shadow-lg">
@@ -17,24 +38,30 @@ export default function Nav() {
               href="/"
               className="text-2xl font-bold text-blue-400 hover:text-primary"
             >
-              <Image src={'/images/logo.jpg'} alt = '' height={56} width={56}></Image>
+              <Image
+                src={"/images/logo.jpg"}
+                alt=""
+                height={56}
+                width={56}
+              ></Image>
             </Link>
           </div>
 
           {/* Links for Desktop */}
           <div className="hidden md:flex space-x-8">
-            <Link href="/" className="hover:text-primary">
-              Home
-            </Link>
-            <Link href="/about" className="hover:text-primary">
-              About
-            </Link>
-            <Link href="/predict" className="hover:text-primary">
-              Predict
-            </Link>
-            <Link href="/contact" className="hover:text-primary">
-              Contact
-            </Link>
+            {links.map((link, index) => (
+              <Link
+                key={index}
+                href={link.href}
+                className={`${
+                  pathname == link.href
+                    ? "border-b border-primary text-primary"
+                    : ""
+                } hover:text-primary`}
+              >
+                {link.name}
+              </Link>
+            ))}
           </div>
 
           {/* Mobile Menu Button */}
@@ -74,34 +101,20 @@ export default function Nav() {
       {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden bg-background">
-          <Link
-            href="/"
-            className="block px-4 py-2 text-sm hover:bg-gray-600 hover:text-primary"
-            onClick={() => setIsOpen(false)}
-          >
-            Home
-          </Link>
-          <Link
-            href="/about"
-            className="block px-4 py-2 text-sm hover:bg-gray-600 hover:text-primary"
-            onClick={() => setIsOpen(false)}
-          >
-            About
-          </Link>
-          <Link
-            href="/predict"
-            className="block px-4 py-2 text-sm hover:bg-gray-600 hover:text-primary"
-            onClick={() => setIsOpen(false)}
-          >
-            Predict
-          </Link>
-          <Link
-            href="/contact"
-            className="block px-4 py-2 text-sm hover:bg-gray-600 hover:text-primary"
-            onClick={() => setIsOpen(false)}
-          >
-            Contact
-          </Link>
+          {links.map((link, index) => (
+            <Link
+              href={link.href}
+              key={index}
+              className={`${
+                pathname == link.href
+                  ? "border-b border-primary text-primary"
+                  : ""
+              } block px-4 py-2 text-sm hover:bg-gray-600 hover:text-primary`}
+              onClick={() => setIsOpen(false)}
+            >
+              {link.name}
+            </Link>
+          ))}
         </div>
       )}
     </nav>
