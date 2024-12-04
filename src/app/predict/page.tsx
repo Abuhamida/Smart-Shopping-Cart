@@ -1,168 +1,82 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import RealTimeDetection from "../components/WebcamPrediction";
 import ProductDetector from "../components/ProductDetector";
-export default function Home() {
-  const [isReal, setIsReal] = useState(false);
-  const [isImage, setIsImage] = useState(false);
+
+export default function Home(): JSX.Element {
+  const [activeComponent, setActiveComponent] =
+    React.useState<string>("realtime");
 
   return (
-    <div className="w-full first-line:lex flex-col items-center justify-center min-h-screen">
-      <div className="w-full flex flex-col px-10 py-10 ">
-        <div className="text-3xl font-bold font-sans text-background">
-          <h1>Welcome to product predict page</h1>
-        </div>
-        {!isImage && !isReal ? (
-          <div className="w-full">
-            <h1 className="pt-5 text-xl text-primary font-semibold">
-              How Product Prediction Works
-            </h1>
-            <div className=" relative w-full">
-              <div className="w-[600px] h-[1.5px] rotate-90 bg-primary absolute top-80 -left-[280px] -z-10"></div>
-              <div className="flex flex-col">
-                <div className="pl-[10px] pt-10 z-1 flex gap-5  ">
-                  <div className="w-5 h-5 rounded-full bg-background mt-1 z-10 flex flex-col justify-center items-center text-white  ">
-                    1
-                  </div>
-                  <div>
-                    <h1 className="text-primary text-xl font-semibold">
-                      Image Capture
-                    </h1>
-                    <p className="pl-2">
-                      When a product is placed in the cart, built-in cameras
-                      capture high-resolution images of the item from multiple
-                      angles.
-                    </p>
-                  </div>
-                </div>
-                <div className="pl-[10px] pt-10 z-1 flex gap-5  ">
-                  <div className="w-5 h-5 rounded-full bg-background mt-1 z-10 flex flex-col justify-center items-center text-white  ">
-                    2
-                  </div>
-                  <div>
-                    <h1 className="text-primary text-xl font-semibold">
-                      Preprocessing
-                    </h1>
-                    <p className="pl-2">
-                      The captured images are cleaned and prepared by adjusting
-                      brightness, contrast, and removing noise to ensure
-                      accurate recognition.
-                    </p>
-                  </div>
-                </div>
-                <div className="pl-[10px] pt-10 z-1 flex gap-5  ">
-                  <div className="w-5 h-5 rounded-full bg-background mt-1 z-10 flex flex-col justify-center items-center text-white  ">
-                    3
-                  </div>
-                  <div>
-                    <h1 className="text-primary text-xl font-semibold">
-                      AI-Powered Detection
-                    </h1>
-                    <p className="pl-2">
-                      Deep Learning Algorithms analyze the images. The system
-                      uses models like Convolutional Neural Networks (CNNs)
-                      trained on a vast dataset of products.
-                    </p>
-                  </div>
-                </div>
-                <div className="pl-[10px] pt-10 z-1 flex gap-5  ">
-                  <div className="w-5 h-5 rounded-full bg-background mt-1 z-10 flex flex-col justify-center items-center text-white  ">
-                    4
-                  </div>
-                  <div>
-                    <h1 className="text-primary text-xl font-semibold">
-                      Feature Matching
-                    </h1>
-                    <p className="pl-2">
-                      Detected features are compared against a preloaded
-                      database of product images and metadata (e.g., name,
-                      category, price).
-                    </p>
-                  </div>
-                </div>
-                <div className="pl-[10px] pt-10 z-1 flex gap-5  ">
-                  <div className="w-5 h-5 rounded-full bg-background mt-1 z-10 flex flex-col justify-center items-center text-white  ">
-                    5
-                  </div>
-                  <div>
-                    <h1 className="text-primary text-xl font-semibold">
-                      Prediction Results
-                    </h1>
-                    <p className="pl-2">
-                      The system identifies the product and provides information
-                      such as:
-                      <span className="text-background font-bold">
-                        &nbsp;Product Name,
-                      </span>
-                      <span className="text-background font-bold">
-                        &nbsp;Category,
-                      </span>
-                      <span className="text-background font-bold">
-                        &nbsp;Price
-                      </span>
-                    </p>
-                  </div>
-                </div>
-                <div className="pl-[10px] pt-10 z-1 flex gap-5  ">
-                  <div className="w-5 h-5 rounded-full bg-background mt-1 z-10 flex flex-col justify-center items-center text-white  ">
-                    6
-                  </div>
-                  <div>
-                    <h1 className="text-primary text-xl font-semibold">
-                      Real-Time Calculation
-                    </h1>
-                    <p className="pl-2">
-                      The detected product's details are instantly added to the
-                      cart summary, updating the total price in real time.
-                    </p>
-                  </div>
-                </div>
-                <div className="pl-[10px] pt-10 z-1 flex gap-5  ">
-                  <div className="w-5 h-5 rounded-full bg-background mt-1 z-10 flex flex-col justify-center items-center text-white  ">
-                    7
-                  </div>
-                  <div>
-                    <h1 className="text-primary text-xl font-semibold">
-                      Continuous Learning
-                    </h1>
-                    <p className="pl-2">
-                      The system improves over time by learning from new
-                      products and user feedback, ensuring even higher accuracy.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <div className="bg-gray-50 text-background min-h-screen pt-10">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-background to-background/90 text-white py-16 text-center">
+        <h1 className="text-4xl font-bold mb-4">Smart Product Detection</h1>
+        <p className="text-lg">
+          Choose between real-time detection or upload an image to identify
+          products instantly.
+        </p>
+      </div>
 
-            <div></div>
+      {/* Navigation Buttons */}
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 py-8 flex justify-center space-x-6">
+        <button
+          onClick={() => setActiveComponent("realtime")}
+          className={`px-6 py-3 rounded-lg text-lg font-bold ${
+            activeComponent === "realtime"
+              ? "bg-background text-white"
+              : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+          } transition duration-300`}
+        >
+          Realtime Detection
+        </button>
+        <button
+          onClick={() => setActiveComponent("image")}
+          className={`px-6 py-3 rounded-lg text-lg font-bold ${
+            activeComponent === "image"
+              ? "bg-background text-white"
+              : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+          } transition duration-300`}
+        >
+          Detect by Image
+        </button>
+      </div>
+
+      {/* Active Component Section */}
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 py-8">
+        {activeComponent === "realtime" && (
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-2xl font-semibold mb-4 text-center">
+              Realtime Detection
+            </h2>
+            <RealTimeDetection />
           </div>
-        ) : (
-          <div>
-            {isReal && <RealTimeDetection />}
-            {isImage && <ProductDetector />}
+        )}
+        {activeComponent === "image" && (
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-2xl font-semibold mb-4 text-center">
+              Detect by Image
+            </h2>
+            <ProductDetector />
           </div>
         )}
       </div>
-      <div className=" py-10 flex flex-col gap-5 w-full items-start px-10">
-        <button
-          className="bg-background text-text px-6 py-3 rounded-2xl text-xl font-medium hover:text-primary "
-          onClick={() => {
-            setIsReal(true);
-            setIsImage(false);
-          }}
-        >
-          Detect Product by Real-Time Detection
-        </button>
-        <button
-          className="bg-background text-text px-6 py-3 rounded-2xl text-xl font-medium hover:text-primary "
-          onClick={() => {
-            setIsReal(false);
-            setIsImage(true);
-          }}
-        >
-          Detect Product by Image
-        </button>
+
+      <div className="bg-background text-white py-16">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 text-center">
+          <h2 className="text-3xl font-semibold mb-4">Try it Now!</h2>
+          <p className="text-lg mb-6">
+            Discover the power of AI with our product detection tools. Start
+            your free trial today.
+          </p>
+          <a
+            href="/contact"
+            className="bg-white text-background px-6 py-3 rounded-lg text-lg font-bold hover:bg-gray-200 transition duration-300"
+          >
+            Contact Us for More Info
+          </a>
+        </div>
       </div>
     </div>
   );

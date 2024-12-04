@@ -15,17 +15,16 @@ export default function Home() {
         style={{
           backgroundImage: `url('/main-bg3.png')`,
         }}
-        initial={{ opacity: 0.5, x: 50, y: 0 }}
+        initial={{ opacity: 0.5, x: -50, y: 0 }}
         whileInView={{ opacity: 1, y: 0, x: 0 }}
         transition={{ duration: 1.5, ease: "easeInOut" }}
         viewport={{ once: true }}
-        
       >
         <motion.div
           className="text-center text-white px-6"
           initial={{ opacity: 0, x: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0, x: 0 }}
-          transition={{ duration: 1.5, ease: "easeInOut" }}
+          transition={{ duration: 1.5, ease: "easeInOut" , delay:0.5 }}
           viewport={{ once: true }}
         >
           <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-4">
@@ -34,14 +33,23 @@ export default function Home() {
           <p className="text-lg md:text-2xl mb-6">
             Experience seamless shopping with AI-powered carts.
           </p>
-          <Link href={'/predict'} className="bg-background hover:bg-primary text-white font-bold py-3 px-8 rounded-md">
+          <Link
+            href={"/predict"}
+            className="bg-background hover:bg-primary text-white font-bold py-3 px-8 rounded-md"
+          >
             Try Free Demo
           </Link>
         </motion.div>
       </motion.div>
 
       {/* Introduction Section */}
-      <section className="py-16 px-8 bg-white">
+      <motion.section
+        className="py-16 px-8 bg-white"
+        initial={{ opacity: 0, x: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0, x: 0 }}
+        transition={{ duration: 1.5, ease: "easeInOut" }}
+        viewport={{ once: true }}
+      >
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">About Smart Shopping Cart</h2>
           <p className="text-lg text-gray-600">
@@ -51,7 +59,7 @@ export default function Home() {
             solution.
           </p>
         </div>
-      </section>
+      </motion.section>
 
       {/* Features Section */}
       <section className="py-16 bg-gray-100">
@@ -68,27 +76,35 @@ export default function Home() {
               {
                 title: "Seamless Checkout",
                 description: "Skip the lines and pay directly via the cart.",
-                icon: "/icons/checkout.svg",
+                icon: "/checkout.png",
               },
               {
                 title: "Personalized Recommendations",
                 description:
                   "Get tailored product suggestions based on your preferences.",
-                icon: "/icons/recommendations.svg",
+                icon: "/Recommendations.png",
               },
             ].map((feature, index) => (
-              <div
+              <motion.div
                 key={index}
                 className="p-6 bg-white shadow-lg rounded-md text-center"
+                initial={{ opacity: 0, x: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0, x: 0 }}
+                transition={{
+                  duration: 1,
+                  ease: "easeInOut",
+                  delay: 0.4 * index,
+                }}
+                viewport={{ once: true }}
               >
                 <img
                   src={feature.icon}
                   alt={feature.title}
-                  className="w-16 h-32 mx-auto mb-4"
+                  className="w-16 h-16 mx-auto mb-4 "
                 />
                 <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
                 <p className="text-gray-600">{feature.description}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -103,11 +119,12 @@ export default function Home() {
           <iframe
             width="100%"
             height="400"
-            src="https://www.youtube.com/embed/example-video"
+            src="https://drive.google.com/file/d/1nQub6-MFoiFiLvgXKkEJPIKgzGiim87u/preview"
             title="Smart Cart Demo"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
+          
           ></iframe>
         </div>
       </section>
@@ -122,18 +139,26 @@ export default function Home() {
                 name: "Sarah J.",
                 comment:
                   "The Smart Shopping Cart made my grocery trips so much faster and easier!",
-                photo: "/testimonials/sarah.jpg",
+                photo: "/female.png",
               },
               {
                 name: "John D.",
                 comment:
                   "I love the personalized recommendations. They’re spot on!",
-                photo: "/testimonials/john.jpg",
+                photo: "/male.png",
               },
             ].map((testimonial, index) => (
-              <div
+              <motion.div
                 key={index}
                 className="p-6 bg-white shadow-lg rounded-md text-center"
+                initial={{ opacity: 0, x:-50, y: 0 }}
+                whileInView={{ opacity: 1, y: 0, x: 0 }}
+                transition={{
+                  duration: 1,
+                  ease: "easeInOut",
+                  delay: 0.4 * index,
+                }}
+                viewport={{ once: true }}
               >
                 <img
                   src={testimonial.photo}
@@ -142,7 +167,7 @@ export default function Home() {
                 />
                 <p className="italic text-gray-600">"{testimonial.comment}"</p>
                 <h4 className="text-lg font-bold mt-4">{testimonial.name}</h4>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>

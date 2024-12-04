@@ -14,9 +14,15 @@ export default function page() {
   };
 
   return (
-    <div className="px-10 py-10 w-full flex flex-col justify-center items-center">
-      
-      <h1 className="text-3xl font-bold text-background ">Contact Us</h1>
+    <div className="pt-10 w-full flex flex-col justify-center items-center">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-background to-background/90 text-white py-16 text-center w-full">
+        <h1 className="text-4xl font-bold mb-4">Get in Touch</h1>
+        <p className="text-lg">
+          We’d love to hear from you! Contact us for inquiries, feedback, or
+          support.
+        </p>
+      </div>
       <div className="max-w-screen-xl mt-10 px-8 grid gap-8 grid-cols-1 md:grid-cols-2 md:px-12 lg:px-16 xl:px-32 py-16 mx-auto bg-gray-100 text-gray-900 rounded-lg shadow-lg">
         <div className="flex flex-col justify-between">
           <div>
@@ -24,7 +30,7 @@ export default function page() {
               Lets talk about everything!
             </h2>
             <div className="text-gray-700 mt-8">
-              Hate forms? Send us an <span className="underline">email</span>{" "}
+              Hate forms? Send us an <span className="underline">email</span>
               instead.
             </div>
           </div>
@@ -1017,6 +1023,31 @@ export default function page() {
               Send Message
             </button>
           </div>
+        </div>
+      </div>
+
+      <div className="bg-background py-8 w-full mt-10 text-white">
+        <div className="max-w-4xl mx-auto text-center space-y-4 text-white">
+          <h2 className="text-2xl font-semibold">Other Ways to Reach Us</h2>
+          <p>
+            <span className="font-medium">Email:&nbsp;</span>
+            <a
+              href="mailto:info@smartcart.com"
+              className="text-blue-600 hover:underline"
+            >
+              smartcart2025@gmail.com
+            </a>
+          </p>
+          <p>
+            <span className="font-medium">Phone:</span>
+            <a href="tel:+1234567890" className="text-blue-600 hover:underline">
+              +1 234 567 890
+            </a>
+          </p>
+          <p>
+            <span className="font-medium">Location:</span> 123 SmartCart Lane,
+            Innovation City, USA
+          </p>
         </div>
       </div>
     </div>

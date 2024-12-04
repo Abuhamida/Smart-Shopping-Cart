@@ -1,73 +1,95 @@
+'use client'
+
 import React from "react";
 
-import Image from "next/image";
-
-export default function page() {
+const AboutPage: React.FC = () => {
   return (
-    <div className="flex flex-col py-10 items-center min-h-screen">
-      <div className=" w-full top-0 px-10">
-        <h1 className="text-3xl text-background font-bold font-sans">
-          About Smart Shopping Cart
-        </h1>
-      </div>
-      <div className="w-full px-10 flex  gap-4 h-[400px]">
-        <div className="w-full px-10 flex flex-col gap-4 justify-center">
-          <p className="text-xl leading-7">
-            At Smart Shopping Cart, we are redefining the in-store shopping
-            experience with an innovative blend of AI, IoT, and computer vision
-            technologies. Our mission is to make shopping more convenient,
-            efficient, and enjoyable for everyone.
+    <div className="bg-gray-100 text-background min-h-screen pt-10">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-background to-background/90 text-white py-20">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10">
+          <h1 className="text-4xl font-bold mb-4">About Smart Shopping Cart</h1>
+          <p className="text-lg">
+            Revolutionizing the way we shop with AI, computer vision, and IoT. 
+            Experience seamless and efficient shopping like never before.
           </p>
         </div>
-        <div className="w-full px-10 flex relative ">
-          <Image
-            src="/smartcart-turku-finland.jpg"
-            alt=""
-            fill
-            className=" rounded-xl"
-          ></Image>
+      </div>
+
+      {/* Mission and Vision */}
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 py-16">
+        <div className="grid md:grid-cols-2 gap-10">
+          {/* Mission */}
+          <div>
+            <h2 className="text-3xl font-semibold mb-4">Our Mission</h2>
+            <p className="text-lg leading-relaxed">
+              To provide a smarter and more efficient shopping experience through cutting-edge 
+              technology, reducing time spent in checkout lines and enhancing customer satisfaction.
+            </p>
+          </div>
+          {/* Vision */}
+          <div>
+            <h2 className="text-3xl font-semibold mb-4">Our Vision</h2>
+            <p className="text-lg leading-relaxed">
+              To revolutionize retail by integrating AI and IoT into everyday shopping, 
+              creating a future where convenience and innovation meet seamlessly.
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className=" w-full py-16">
-        <div className=" w-full top-0 px-10 flex flex-col items-start">
-          <h1 className="text-3xl text-background font-bold font-sans">
-            What is Smart Shopping Cart?
-          </h1>
-        </div>
-        <div className="flex flex-col justify-center items-center ">
-          <div className="w-full flex h-[300px] px-10 gap-10 pt-10  ">
-          <div className="w-full px-10 flex relative ">
-          <Image
-            src="/107087167-1657577323174-New_Version_of_the_Dash_Cart_Screen.jpg"
-            alt=""
-            fill
-            className=" rounded-xl"
-          ></Image>
-        </div>
-            <div className="w-full">
-              <h1 className="text-xl font-bold pb-7">
-                Our Smart Shopping Cart is an intelligent retail solution
-                designed to:
-              </h1>
-              <ul className=" list-disc leading-5 gap-7 flex flex-col px-10  ">
-                <li className="text-primary ">
-                  Automatically recognize items placed in the cart using cameras
-                  and sensors.
-                </li> 
-                <li className="text-primary ">
-                  Calculate the total cost in real-time, giving you complete
-                  control over your shopping expenses.
-                </li>
-                <li className="text-primary ">
-                  Simplify the checkout process with seamless, cashier-less
-                  payment options.
-                </li>
-              </ul>
+      {/* Technology Section */}
+      <div className="bg-white py-16">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10">
+          <h2 className="text-3xl font-semibold mb-8 text-center">Technology We Use</h2>
+          <div className="grid md:grid-cols-3 gap-10">
+            {/* AI */}
+            <div className="bg-gray-100 p-6 rounded-lg shadow-md text-center">
+              <h3 className="text-xl font-bold mb-4">Artificial Intelligence</h3>
+              <p className="text-gray-600">
+                Smart algorithms to recognize products, predict customer preferences, 
+                and optimize the shopping process.
+              </p>
+            </div>
+            {/* Computer Vision */}
+            <div className="bg-gray-100 p-6 rounded-lg shadow-md text-center">
+              <h3 className="text-xl font-bold mb-4">Computer Vision</h3>
+              <p className="text-gray-600">
+                Real-time item recognition using cameras and sensors for automatic billing 
+                and inventory management.
+              </p>
+            </div>
+            {/* IoT */}
+            <div className="bg-gray-100 p-6 rounded-lg shadow-md text-center">
+              <h3 className="text-xl font-bold mb-4">IoT Integration</h3>
+              <p className="text-gray-600">
+                Seamlessly connected devices to track carts, assist with navigation, and provide 
+                a personalized experience.
+              </p>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Call to Action */}
+      <div className="bg-background text-white py-16">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 text-center">
+          <h2 className="text-3xl font-semibold mb-4">Learn More About Smart Shopping</h2>
+          <p className="text-lg mb-6">
+            Join us on our journey to redefine the shopping experience. Stay updated with 
+            our innovations and advancements.
+          </p>
+          <a
+            href="/contact"
+            className="bg-white text-background px-6 py-3 rounded-lg text-lg font-bold hover:bg-gray-200 transition duration-300"
+          >
+            Contact Us
+          </a>
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default AboutPage;
+
