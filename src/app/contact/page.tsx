@@ -10,7 +10,6 @@ export default function page() {
   const handleSubmit = (e: any) => {
     e.preventDefault();
     // Handle form submission logic here
-    console.log({ name, email, message });
   };
 
   return (

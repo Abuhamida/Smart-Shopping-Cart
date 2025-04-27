@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import RealTimeDetection from "../components/WebcamPrediction";
-import ProductDetector from "../components/ProductDetector";
+import RealTimeDetection from "./WebcamPrediction";
+import ProductDetector from "./ProductDetector";
 import { motion } from "motion/react";
 export default function Home(): JSX.Element {
   const [activeComponent, setActiveComponent] =
