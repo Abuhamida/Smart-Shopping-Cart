@@ -19,8 +19,8 @@ export default function Nav() {
       name: "About",
     },
     {
-      href: "/predict",
-      name: "Predict",
+      href: "/services",
+      name: "Services",
     },
     {
       href: "/contact",
