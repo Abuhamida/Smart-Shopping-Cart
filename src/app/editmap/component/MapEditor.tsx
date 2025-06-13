@@ -13,6 +13,7 @@ const MapEditor: React.FC<MapEditorProps> = ({
   const [connections, setConnections] = useState<Connection[]>(
     initialData?.edges || []
   );
+  console.log(initialData?.vertices);
   const [selectedPoint, setSelectedPoint] = useState<string | null>(null);
   const [selectedConnection, setSelectedConnection] = useState<string | null>(
     null
@@ -85,34 +86,47 @@ const MapEditor: React.FC<MapEditorProps> = ({
 
   const handleSvgClick = async (e: React.MouseEvent<SVGElement>) => {
     if (connectMode || !svgLoaded || !svgRef.current) return;
-  
+
     const point = svgRef.current.createSVGPoint();
     point.x = e.clientX;
     point.y = e.clientY;
     const svgPoint = point.matrixTransform(
       svgRef.current.getScreenCTM()?.inverse()
     );
-  
+
+    // Calculate the next point ID based on the highest existing number
+    const getNextPointId = () => {
+      if (points.length === 0) return "v1";
+
+      const maxId = points.reduce((max, p) => {
+        const num = parseInt(p.id.replace("v", ""), 10);
+        return num > max ? num : max;
+      }, 0);
+
+      return `v${maxId + 1}`;
+    };
+
     const newPoint: Point = {
-      id: `v${points.length + 1}`,
-       floor_id: floor_id,
-       object_name: null,
+      id: getNextPointId(),
+      floor_id: floor_id,
+      object_name: null,
       cx: Math.round(svgPoint.x),
       cy: Math.round(svgPoint.y),
     };
-  
+
     try {
       const response = await fetch("/api/map/add/points", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newPoint),
       });
+
       if (!response.ok) {
         throw new Error("Failed to save point");
       }
-  
-      const savedPoint = await response.json(); 
-  
+
+      const savedPoint = await response.json();
+
       setPoints((prev) => [...prev, newPoint]);
       setEditingPoint(newPoint.id);
       setPointName("");
@@ -120,7 +134,7 @@ const MapEditor: React.FC<MapEditorProps> = ({
       console.error("Error saving point:", error);
     }
   };
-  
+
   const handlePointClick = async (pointId: string) => {
     if (connectMode) {
       if (!connectStart) {
@@ -128,11 +142,11 @@ const MapEditor: React.FC<MapEditorProps> = ({
       } else if (connectStart !== pointId) {
         const connectionId = `${connectStart}_to_${pointId}`;
         const reverseConnectionId = `${pointId}_to_${connectStart}`;
-  
+
         const connectionExists = connections.some(
           (conn) => conn.id === connectionId || conn.id === reverseConnectionId
         );
-  
+
         if (!connectionExists) {
           const newConnections = [
             {
@@ -142,8 +156,7 @@ const MapEditor: React.FC<MapEditorProps> = ({
               floor_id: floor_id,
             },
           ];
-          
-  
+
           if (bidirectionalConnection) {
             newConnections.push({
               id: reverseConnectionId,
@@ -152,7 +165,7 @@ const MapEditor: React.FC<MapEditorProps> = ({
               to: connectStart,
             });
           }
-  
+
           try {
             // Save each connection to the backend
             for (const connection of newConnections) {
@@ -161,17 +174,20 @@ const MapEditor: React.FC<MapEditorProps> = ({
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                   ...connection,
-                  floor_id: floor_id,  // assuming you also want to send the map name
+                  floor_id: floor_id, // assuming you also want to send the map name
                 }),
               });
-  
+
               if (!response.ok) {
                 throw new Error("Failed to save connection");
               }
             }
-  
+
             // If all API calls succeed, update the local state
-            setConnections((prevConnections) => [...prevConnections, ...newConnections]);
+            setConnections((prevConnections) => [
+              ...prevConnections,
+              ...newConnections,
+            ]);
           } catch (error) {
             console.error("Error saving connection:", error);
           }
@@ -187,29 +203,29 @@ const MapEditor: React.FC<MapEditorProps> = ({
       }
     }
   };
-  
+
   const handleNameSave = async () => {
     if (!editingPoint) return;
-  
+
     const updatedPoint = points.find((p) => p.id === editingPoint);
     if (!updatedPoint) return;
-  
+
     const updated = {
       ...updatedPoint,
       object_name: pointName || null,
     };
-  
+
     try {
-      const response = await fetch("/api/map/update", {
+      const response = await fetch("/api/map/update/points", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updated),
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to update point");
       }
-  
+
       setPoints((prev) =>
         prev.map((point) => (point.id === editingPoint ? updated : point))
       );
@@ -224,37 +240,32 @@ const MapEditor: React.FC<MapEditorProps> = ({
       const response = await fetch("/api/map/delete/points", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: pointId }),
+        body: JSON.stringify({ floor_id, pointId }),
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to delete point");
       }
-  
+
       // Delete related connections
       const relatedConnections = connections.filter(
-        (c) =>
-          c.from === pointId ||
-          c.to === pointId ||
-          c.id.includes(pointId) // Also check in connection id like "v16_to_v26"
+        (c) => c.from === pointId || c.to === pointId || c.id.includes(pointId) // Also check in connection id like "v16_to_v26"
       );
-  
+
       for (const conn of relatedConnections) {
         await fetch("/api/map/delete/edges", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: conn.id }),
+          body: JSON.stringify({ floor_id, id: conn.id }),
         });
       }
-  
+
       // Update local state after deletion
       setPoints((prev) => prev.filter((p) => p.id !== pointId));
       setConnections((prev) =>
         prev.filter(
           (c) =>
-            c.from !== pointId &&
-            c.to !== pointId &&
-            !c.id.includes(pointId) // Also remove locally
+            c.from !== pointId && c.to !== pointId && !c.id.includes(pointId) // Also remove locally
         )
       );
       setSelectedPoint(null);
@@ -263,7 +274,7 @@ const MapEditor: React.FC<MapEditorProps> = ({
       console.error("Error deleting point:", error);
     }
   };
-  
+
   // Delete connection
   const handleDeleteConnection = async (connectionId: string) => {
     try {
@@ -272,18 +283,17 @@ const MapEditor: React.FC<MapEditorProps> = ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: connectionId }),
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to delete connection");
       }
-  
+
       setConnections((prev) => prev.filter((c) => c.id !== connectionId));
       setSelectedConnection(null);
     } catch (error) {
       console.error("Error deleting connection:", error);
     }
   };
-  
 
   // Check if connection is bidirectional
   const isBidirectionalConnection = (conn: Connection) => {
@@ -345,136 +355,140 @@ const MapEditor: React.FC<MapEditorProps> = ({
       )}
 
       {/* SVG Map */}
-      <svg
-        ref={svgRef}
-        className="w-full h-full"
-        viewBox={`${svgViewBox.x} ${svgViewBox.y} ${svgViewBox.width} ${svgViewBox.height}`}
-        onClick={handleSvgClick}
-        preserveAspectRatio="xMidYMid meet"
+      <div
+        className={`absolute transition-all duration-500 ease-in-out left-[60px] right-0 top-0 bottom-0`}
       >
-        {/* Background Map */}
-        <image
-          ref={imageRef}
-          href={floorSvgPath}
-          width="100%"
-          height="100%"
-          className="opacity-75"
+        <svg
+          ref={svgRef}
+          className="w-full h-full"
+          viewBox="0 0 1461.95 1149.136"
+          onClick={handleSvgClick}
           preserveAspectRatio="xMidYMid meet"
-        />
-
-        {/* Connections */}
-        {connections.map((conn) => {
-          const from = points.find((p) => p.id === conn.from);
-          const to = points.find((p) => p.id === conn.to);
-          if (!from || !to) return null;
-
-          const isBidirectional = isBidirectionalConnection(conn);
-          const isSelected = selectedConnection === conn.id;
-          const isConnectedToSelected =
-            selectedPoint &&
-            (conn.from === selectedPoint || conn.to === selectedPoint);
-
-          return (
-            <g key={conn.id}>
-              <line
-                x1={from.cx}
-                y1={from.cy}
-                x2={to.cx}
-                y2={to.cy}
-                stroke={
-                  isSelected
-                    ? "#3b82f6"
-                    : isConnectedToSelected
-                    ? "#60a5fa"
-                    : "#60a5fa"
-                }
-                strokeWidth={isSelected ? "3" : "2"}
-                strokeDasharray={isBidirectional ? "none" : "4"}
-                className={`opacity-${
-                  isSelected ? "100" : isConnectedToSelected ? "75" : "50"
-                }`}
-              />
-            </g>
-          );
-        })}
-
-        {/* Active Connection */}
-        {connectStart && connectMode && (
-          <line
-            x1={points.find((p) => p.id === connectStart)?.cx || 0}
-            y1={points.find((p) => p.id === connectStart)?.cy || 0}
-            x2={points.find((p) => p.id === selectedPoint)?.cx || 0}
-            y2={points.find((p) => p.id === selectedPoint)?.cy || 0}
-            stroke="#60a5fa"
-            strokeWidth="2"
-            strokeDasharray="4"
-            className="opacity-50"
+        >
+          {/* Background Map */}
+          <image
+            ref={imageRef}
+            href={floorSvgPath}
+            width="1461.95"
+            height="1149.136"
+            className="opacity-75"
+            preserveAspectRatio="xMidYMid meet"
           />
-        )}
 
-        {/* Points */}
-        {points.map((point) => {
-          const isHovered = selectedPoint === point.id;
-          const isConnectStart = connectStart === point.id;
-          const connectedPoints = getConnectionsForPoint(point.id);
+          {/* Connections */}
+          {connections.map((conn) => {
+            const from = points.find((p) => p.id === conn.from);
+            const to = points.find((p) => p.id === conn.to);
+            if (!from || !to) return null;
 
-          return (
-            <g key={point.id}>
-              <circle
-                cx={point.cx}
-                cy={point.cy}
-                r={isHovered ? "8" : connectedPoints.length ? "6" : "5"}
-                fill={
-                  isHovered
-                    ? "#3b82f6"
-                    : isConnectStart
-                    ? "#34d399"
-                    : point.object_name
-                    ? "#f59e0b"
-                    : "#6b7280"
-                }
-                stroke={
-                  isHovered
-                    ? "#93c5fd"
-                    : connectedPoints.length
-                    ? "#60a5fa"
-                    : "transparent"
-                }
-                strokeWidth="2"
-                className="cursor-pointer transition-all duration-200"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handlePointClick(point.id);
-                }}
-              />
-              {point.object_name && (
-                <text
-                  x={point.cx}
-                  y={point.cy - 10}
-                  textAnchor="middle"
-                  fill="#e5e7eb"
-                  fontSize="12"
-                  className="pointer-events-none"
-                >
-                  {point.object_name}
-                </text>
-              )}
-              {point.id && (
-                <text
-                  x={point.cx}
-                  y={point.cy + 15}
-                  textAnchor="middle"
-                  fill="#e5e7eb"
-                  fontSize="12"
-                  className="pointer-events-none"
-                >
-                  {point.id}
-                </text>
-              )}
-            </g>
-          );
-        })}
-      </svg>
+            const isBidirectional = isBidirectionalConnection(conn);
+            const isSelected = selectedConnection === conn.id;
+            const isConnectedToSelected =
+              selectedPoint &&
+              (conn.from === selectedPoint || conn.to === selectedPoint);
+
+            return (
+              <g key={conn.id}>
+                <line
+                  x1={from.cx}
+                  y1={from.cy}
+                  x2={to.cx}
+                  y2={to.cy}
+                  stroke={
+                    isSelected
+                      ? "#3b82f6"
+                      : isConnectedToSelected
+                      ? "#60a5fa"
+                      : "#60a5fa"
+                  }
+                  strokeWidth={isSelected ? "3" : "2"}
+                  strokeDasharray={isBidirectional ? "none" : "4"}
+                  className={`opacity-${
+                    isSelected ? "100" : isConnectedToSelected ? "75" : "50"
+                  }`}
+                />
+              </g>
+            );
+          })}
+
+          {/* Active Connection */}
+          {connectStart && connectMode && (
+            <line
+              x1={points.find((p) => p.id === connectStart)?.cx || 0}
+              y1={points.find((p) => p.id === connectStart)?.cy || 0}
+              x2={points.find((p) => p.id === selectedPoint)?.cx || 0}
+              y2={points.find((p) => p.id === selectedPoint)?.cy || 0}
+              stroke="#60a5fa"
+              strokeWidth="2"
+              strokeDasharray="4"
+              className="opacity-50"
+            />
+          )}
+
+          {/* Points */}
+          {points.map((point) => {
+            const isHovered = selectedPoint === point.id;
+            const isConnectStart = connectStart === point.id;
+            const connectedPoints = getConnectionsForPoint(point.id);
+
+            return (
+              <g key={point.id}>
+                <circle
+                  cx={point.cx}
+                  cy={point.cy}
+                  r={isHovered ? "8" : connectedPoints.length ? "6" : "5"}
+                  fill={
+                    isHovered
+                      ? "#3b82f6"
+                      : isConnectStart
+                      ? "#34d399"
+                      : point.object_name
+                      ? "#f59e0b"
+                      : "#6b7280"
+                  }
+                  stroke={
+                    isHovered
+                      ? "#93c5fd"
+                      : connectedPoints.length
+                      ? "#60a5fa"
+                      : "transparent"
+                  }
+                  strokeWidth="2"
+                  className="cursor-pointer transition-all duration-200"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePointClick(point.id);
+                  }}
+                />
+                {point.object_name && (
+                  <text
+                    x={point.cx}
+                    y={point.cy - 10}
+                    textAnchor="middle"
+                    fill="#e5e7eb"
+                    fontSize="12"
+                    className="pointer-events-none"
+                  >
+                    {point.object_name}
+                  </text>
+                )}
+                {point.id && (
+                  <text
+                    x={point.cx}
+                    y={point.cy + 15}
+                    textAnchor="middle"
+                    fill="#e5e7eb"
+                    fontSize="12"
+                    className="pointer-events-none"
+                  >
+                    {point.id}
+                  </text>
+                )}
+              </g>
+            );
+          })}
+        </svg>
+      </div>
     </div>
   );
 };

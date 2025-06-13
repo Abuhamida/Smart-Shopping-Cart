@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
 
     if (error) throw error;
 
-    return NextResponse.json({ message: "floors added successfully!", project: data });
+    return NextResponse.json({ message: "floors added successfully!", data: data });
   } catch (error: any) {
     return NextResponse.json({ error: error.message });
   }

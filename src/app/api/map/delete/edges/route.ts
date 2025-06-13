@@ -3,7 +3,8 @@ import { supabase } from "@/app/lib/supabaseClient";
 
 export async function DELETE(req: NextRequest) {
   try {
-    const id = await req.json(); // Get the projectId from the request query params
+    const { floor_id, id } = await req.json(); // Get the projectId from the request query params
+
     const Id = id.id;
     if (!Id) {
       return NextResponse.json({ error: "Project ID is required" });
@@ -13,7 +14,8 @@ export async function DELETE(req: NextRequest) {
     const { data, error } = await supabase
       .from("edges")
       .delete()
-      .eq("id", Id);
+      .eq("id", Id)
+      .eq("floor_id", floor_id);
 
     if (error) throw error;
 

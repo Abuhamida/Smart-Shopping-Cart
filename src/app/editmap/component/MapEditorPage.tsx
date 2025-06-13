@@ -3,37 +3,42 @@ import React, { useState, useEffect } from "react";
 import MapEditor from "./MapEditor";
 import { Floor } from "./types";
 
-const MapEditorPage: React.FC = () => {
+type MapEditorPageProps = {
+  id: number;
+};
+
+export default function MapEditorPage({ id }: MapEditorPageProps) {
   const [floors, setFloors] = useState<Floor[]>([]);
   const [selectedFloor, setSelectedFloor] = useState<Floor | null>(null);
   const [exportedData, setExportedData] = useState<string | null>(null);
   const [initialData, setInitialData] = useState<any>(null);
-  const [floor_id, setFloorId] = useState<number>(0);
+  const [floor_id, setFloorId] = useState<number>(id);
+  const [loading, setLoading] = useState<boolean>(true); // Spinner state
 
-  // Fetch floors from API
   useEffect(() => {
     const fetchFloors = async () => {
       try {
-        const res = await fetch(`/api/map/get?id=${floor_id}`);
+        setLoading(true);
+        const res = await fetch(`/api/map/get/points?id=${floor_id}`);
         const data = await res.json();
-        // Transform API data to match Floor interface
         const transformedFloors = data.map((floor: any) => ({
-          id: floor.id.toString(), // Ensure id is a string
+          id: floor.id.toString(),
           name: floor.name,
           svgPath: floor.svgPath,
           graphData: floor.graphData,
         }));
         setFloors(transformedFloors);
-        setSelectedFloor(transformedFloors[0]); // Default to first floor
+        setSelectedFloor(transformedFloors[0]);
       } catch (error) {
         console.error("Error fetching floors:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchFloors();
   }, []);
 
-  // Update initial data when floor changes
   useEffect(() => {
     if (selectedFloor) {
       setInitialData({
@@ -42,6 +47,7 @@ const MapEditorPage: React.FC = () => {
       });
     }
   }, [selectedFloor]);
+
   return (
     <div className="flex flex-col h-screen w-full">
       <div className="bg-gray-800 p-4 flex items-center justify-between">
@@ -64,12 +70,19 @@ const MapEditorPage: React.FC = () => {
       </div>
 
       <div className="flex-1 relative">
-        {initialData && selectedFloor && (
-          <MapEditor
-            floorSvgPath={selectedFloor.svgPath}
-            initialData={initialData}
-            floor_id={floor_id}
-          />
+        {loading ? (
+          <div className="flex justify-center items-center h-full">
+            <div className="w-12 h-12 border-4 border-[#001b30] border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : (
+          initialData &&
+          selectedFloor && (
+            <MapEditor
+              floorSvgPath={selectedFloor.svgPath}
+              initialData={initialData}
+              floor_id={floor_id}
+            />
+          )
         )}
       </div>
 
@@ -104,6 +117,4 @@ const MapEditorPage: React.FC = () => {
       )}
     </div>
   );
-};
-
-export default MapEditorPage;
+}
