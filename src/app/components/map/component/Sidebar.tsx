@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { VertexData, GraphData, FloorData } from "./types";
-
+import { usePathname } from "next/navigation";
 interface SidebarProps {
   currentFloorIndex: number;
   setCurrentFloorIndex: (index: number) => void;
@@ -46,6 +46,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     .filter((vertex) =>
       vertex.object_name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
+  const pathname = usePathname();
+  console.log(pathname);
 
   const clearRoute = () => {
     setSelectedStart(null);
@@ -80,7 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   }, []);
 
   return (
-    <div className="h-full flex flex-col text-gray-300 bg-[#001b30]">
+    <div className={`h-full flex flex-col text-gray-300 ${pathname === "/map" ? "bg-[#01205e]" : "bg-[#001b30]"}`}>
       {/* Sidebar Header */}
       <div className="p-4">
         <div className="flex justify-between items-center">
@@ -138,7 +140,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             onClick={() => setExpandedSection("floor")}
             className={`p-2 rounded-lg transition-colors flex items-center justify-center gap-1.5 ${
               expandedSection === "floor"
-                ? "bg-blue-500/20 text-blue-400"
+                ? "bg-[#01205e]  text-blue-400"
                 : "text-gray-400 hover:bg-blue-500/10"
             }`}
           >
@@ -162,8 +164,8 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar Content */}
       <div className="flex-1 overflow-y-auto">
-        {/* Floor Section */}
-        {expandedSection === "floor" && (
+         {/* Floor Section */}
+         {expandedSection === "floor" && (
           <div className="p-4 space-y-4">
             <h3 className="text-sm font-medium text-gray-400">Select Floor</h3>
             <div className="grid grid-cols-1 gap-3">
@@ -173,12 +175,12 @@ const Sidebar: React.FC<SidebarProps> = ({
                   onClick={() => setCurrentFloorIndex(floor.id)}
                   className={`p-3 rounded-lg border transition-colors text-left ${
                     currentFloorIndex === floor.id  
-                      ? "bg-blue-500/20 border-blue-500/50 text-blue-400"
-                      : "bg-gray-800/50 border-gray-700 text-gray-400 hover:border-blue-500/30"
+                      ? ` ${pathname === "/map" ? "bg-[#01205e] border-[#60a5fa] text-white" : "bg-blue-500/20 border-blue-500/50 text-blue-400"}`
+                      : ` ${pathname === "/map" ? "bg-[#01205e] border-white/40 text-white" : "bg-gray-800/50 border-gray-700 text-gray-400 hover:border-blue-500/30"}`
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gray-900/50">
+                    <div className={`p-2 rounded-lg ${pathname === "/map" ? `${currentFloorIndex === floor.id ? "bg-[#2d72fd]" : "bg-white"} border-white/40 text-white` : "bg-gray-900/50"}`}>
                       <span className="font-bold">{floor.shortName}</span>
                     </div>
                     <div>
@@ -193,12 +195,11 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
           </div>
         )}
-
         {/* Route Section */}
         {expandedSection === "route" && (
           <div className="p-4 space-y-4">
             {/* Start Point */}
-            <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-700">
+            <div className={`p-3 ${pathname === "/map" ? "bg-[#01205e] border-white/40" : "bg-gray-800/50"} rounded-lg border  border-gray-700`}>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-400 font-medium">
                   Starting Point
@@ -257,7 +258,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <input
                       type="text"
                       placeholder="Search starting point..."
-                      className="w-full p-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-green-500"
+                      className={`w-full p-2 ${pathname === "/map" ? "bg-[#01205e] border-white/40" : "bg-gray-700/50"} border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-green-500`}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -298,7 +299,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
 
             {/* End Point */}
-            <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-700">
+            <div className={`p-3 ${pathname === "/map" ? "bg-[#01205e] border-white/40" : "bg-gray-800/50"} rounded-lg border border-gray-700`}>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-400 font-medium">
                   Destination
@@ -357,7 +358,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <input
                       type="text"
                       placeholder="Search destination..."
-                      className="w-full p-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-500"
+                      className={`w-full p-2 ${pathname === "/map" ? "bg-[#01205e] border-white/40" : "bg-gray-700/50"} border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-500`}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -399,7 +400,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
             {path.length > 1 && (
               <div className="space-y-4">
-                <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
+                <div className={`p-3 ${pathname === "/map" ? "bg-[#01205e] border-white/40" : "bg-gray-800/50"} rounded-lg border border-gray-700/50`}>
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm text-gray-400">
                       Total Distance
@@ -410,7 +411,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   </div>
                   <button
                     onClick={clearRoute}
-                    className="w-full mt-2 bg-gray-800 hover:bg-red-500/20 text-gray-300 hover:text-red-400 p-2 rounded-lg border border-gray-700 transition-colors flex items-center justify-center gap-2"
+                    className={`w-full mt-2 ${pathname === "/map" ? "bg-[#01205e] border-white/40" : "bg-gray-800/50"} hover:bg-red-500/20 text-gray-300 hover:text-red-400 p-2 rounded-lg border border-gray-700 transition-colors flex items-center justify-center gap-2`}
                   >
                     <svg
                       className="w-5 h-5"

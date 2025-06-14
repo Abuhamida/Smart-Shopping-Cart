@@ -3,7 +3,6 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-import bg from "../../public/main-bg2.png";
 import { motion } from "motion/react";
 
 export default function Home() {

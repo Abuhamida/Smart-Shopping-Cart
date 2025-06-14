@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import Sidebar from "./component/Sidebar";
 import { VertexData, GraphData, FloorData } from "./component/types";
+import { usePathname } from "next/navigation";
 
 const IndoorMap: React.FC = () => {
   const [selectedStart, setSelectedStart] = useState<string | null>(null);
@@ -15,6 +16,7 @@ const IndoorMap: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [distance, setDistance] = useState<number>(0);
   // const [floor_id, setFloorId] = useState<number>(2);
+  const pathname = usePathname();
 
   // Find current floor by ID
   useEffect(() => {
@@ -206,7 +208,7 @@ useEffect(() => {
     <div className="w-full h-full bg-gray-50">
       {/* Sidebar */}
       <div
-        className={`absolute left-0 top-16 bottom-0 bg-[#1a1f2d] transition-all duration-500 ease-in-out shadow-xl ${
+        className={`absolute left-0 bottom-0 ${pathname === "/map" ? "bg-[#01205e] top-0" : "bg-[#001b30] top-16"} transition-all duration-500 ease-in-out shadow-xl ${
           isSidebarOpen ? "w-[280px]" : "w-[60px]"
         }`}
       >
@@ -228,7 +230,7 @@ useEffect(() => {
             floorsData={floorsData}
           />
         ) : (
-          <div className="flex flex-col items-center py-4 space-y-4">
+          <div className={`flex flex-col items-center py-4 space-y-4 ${pathname === "/map" ? "bg-[#01205e]" : "bg-[#001b30]"}`}>
             <button
               onClick={() => setIsSidebarOpen(true)}
               className="w-10 h-10 flex items-center justify-center hover:bg-blue-500/20 text-gray-400 hover:text-blue-400 rounded-lg transition-all duration-300 group"
@@ -253,7 +255,7 @@ useEffect(() => {
 
       {/* Map View */}
       <div
-        className={`absolute transition-all duration-500 ease-in-out top-16 ${
+        className={`absolute transition-all duration-500 ease-in-out ${pathname === "/map" ? "top-0" : "top-16"} ${
           isSidebarOpen ? "left-[280px]" : "left-[60px]"
         } right-0 top-0 bottom-0`}
       >
