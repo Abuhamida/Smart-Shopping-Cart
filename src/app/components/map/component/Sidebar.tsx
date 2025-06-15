@@ -81,6 +81,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     fetchFloors();
   }, []);
 
+  console.log(floors)
+
   return (
     <div className={`h-full flex flex-col text-gray-300 ${pathname === "/map" ? "bg-[#01205e]" : "bg-[#001b30]"}`}>
       {/* Sidebar Header */}

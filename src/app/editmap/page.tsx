@@ -15,11 +15,13 @@ export default function Page() {
   const [name, setName] = useState<string>("");
   const [short_name, setShortName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [svg_path, setSvgPath] = useState<string>("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
   const [selectedFloor, setSelectedFloor] = useState<FloorData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true); // 🔹 Loading state
+  const [loading, setLoading] = useState<boolean>(true);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   useEffect(() => {
     fetchFloors();
@@ -38,47 +40,154 @@ export default function Page() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    await fetch(`/api/map/delete/floors?id=${id}`, {
-      method: "DELETE",
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setPreviewUrl(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadImage = async (file: File, floorId?: number): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    if (floorId) formData.append("floorId", floorId.toString());
+
+    const response = await fetch("/api/map/add/image", {
+      method: "POST",
+      body: formData,
     });
-    fetchFloors();
+
+    if (!response.ok) {
+      throw new Error("Failed to upload image");
+    }
+
+    const data = await response.json();
+    return data.imageUrl;
+  };
+
+  const deleteImage = async (filePath: string) => {
+    const response = await fetch("/api/map/add/image", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ filePath }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete image");
+    }
   };
 
   const handleAddFloor = async () => {
-    if (!name || !short_name || !description || !svg_path) {
-      alert("Please fill all the fields");
+    if (!name || !short_name || !description || !imageFile) {
+      alert("Please fill all the fields and select an image");
       return;
     }
-    const response = await fetch("/api/map/add/floors", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, short_name, description, svg_path }),
-    });
-    if (response.ok) {
-      setName("");
-      setShortName("");
-      setDescription("");
-      setSvgPath("");
-      fetchFloors();
+
+    try {
+      setUploadProgress(0);
+
+      // Upload image first
+      const imageUrl = await uploadImage(imageFile);
+
+      // Then create floor record
+      const response = await fetch("/api/map/add/floors", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          short_name,
+          description,
+          svg_path: imageUrl,
+        }),
+      });
+
+      if (response.ok) {
+        setName("");
+        setShortName("");
+        setDescription("");
+        setImageFile(null);
+        setPreviewUrl(null);
+        fetchFloors();
+      }
+    } catch (error) {
+      console.error("Error adding floor:", error);
     }
   };
 
   const handleUpdateFloor = async () => {
     if (!selectedFloor) return;
-    const response = await fetch(
-      `/api/map/update/floors?id=${selectedFloor.id}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, short_name, description, svg_path }),
+
+    try {
+      setUploadProgress(0);
+      let imageUrl = selectedFloor.svg_path;
+
+      // If new image was selected, upload it
+      if (imageFile) {
+        // First delete old image if it exists
+        if (selectedFloor.svg_path) {
+          try {
+            const oldImagePath = selectedFloor.svg_path.split("/maps/")[1];
+            await deleteImage(oldImagePath);
+          } catch (error) {
+            console.error("Error deleting old image:", error);
+          }
+        }
+
+        // Upload new image
+        imageUrl = await uploadImage(imageFile, selectedFloor.id);
       }
-    );
-    if (response.ok) {
-      setEditModalOpen(false);
-      setSelectedFloor(null);
-      fetchFloors();
+
+      // Update floor record
+      const response = await fetch(
+        `/api/map/update/floors?id=${selectedFloor.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            short_name,
+            description,
+            svg_path: imageUrl,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        setEditModalOpen(false);
+        setSelectedFloor(null);
+        setImageFile(null);
+        setPreviewUrl(null);
+        fetchFloors();
+      }
+    } catch (error) {
+      console.error("Error updating floor:", error);
     }
+  };
+
+  const handleDelete = async (id: number) => {
+    // First delete the associated images
+    try {
+      const floorToDelete = floors.find((floor) => floor.id === id);
+      if (floorToDelete?.svg_path) {
+        const imagePath = floorToDelete.svg_path.split("/maps/")[1];
+        await deleteImage(imagePath);
+      }
+    } catch (error) {
+      console.error("Error deleting floor images:", error);
+    }
+
+    // Then delete the floor record
+    await fetch(`/api/map/delete/floors?id=${id}`, {
+      method: "DELETE",
+    });
+    fetchFloors();
   };
 
   const openEditModal = (floor: FloorData) => {
@@ -86,7 +195,8 @@ export default function Page() {
     setName(floor.name);
     setShortName(floor.short_name);
     setDescription(floor.description);
-    setSvgPath(floor.svg_path);
+    setImageFile(null);
+    setPreviewUrl(floor.svg_path);
     setEditModalOpen(true);
   };
 
@@ -106,8 +216,10 @@ export default function Page() {
               <h1>name: {floor.name}</h1>
               <h2>short name: {floor.short_name}</h2>
               <h3>description: {floor.description}</h3>
-              <h4>svg path: {floor.svg_path}</h4>
-              <img src={floor.svg_path} alt="Floor" className="w-40 h-40" />
+              <h4 className="w-11/12 overflow-hidden text-ellipsis whitespace-nowrap">
+                svg path: {floor.svg_path}
+              </h4>
+              <img src={floor.svg_path} alt="Floor" className="w-36 h-36" />
               <div className="flex items-center justify-between pt-4 w-full">
                 <Link
                   href={`/editmap/${floor.id}`}
@@ -131,8 +243,8 @@ export default function Page() {
             </div>
           ))}{" "}
           {/* Add New Floor */}
-          <div className="w-96 h-96 rounded-xl bg-[#001b30]/80 text-white flex flex-col items-start justify-center gap-2 p-4">
-            <h1>Add Floor</h1>
+          <div className="w-96 min-h-96 rounded-xl bg-[#001b30]/80 text-white flex flex-col items-start justify-center gap-2 p-4">
+            <h1 className="text-2xl font-bold w-full text-center">Add Floor</h1>
             <input
               type="text"
               placeholder="Name"
@@ -154,19 +266,37 @@ export default function Page() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
-            <input
-              type="text"
-              placeholder="SVG Path"
-              className="input text-black"
-              value={svg_path}
-              onChange={(e) => setSvgPath(e.target.value)}
-            />
-            <button
-              className="text-white bg-[#001b30] px-2 py-1 rounded-md hover:bg-[#001b30]/80"
+            <div className="w-full">
+              
+              <input
+                type="file"
+                accept="image/*"
+                 className="file-input "
+                onChange={handleFileChange}
+              />
+              {uploadProgress > 0 && uploadProgress < 100 && (
+                <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                  <div
+                    className="bg-blue-600 h-2.5 rounded-full"
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+              )}
+              {previewUrl && (
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="mt-2 w-40 h-40 object-contain"
+                />
+              )}
+            </div>
+            <div className="flex justify-center gap-2 w-full"><button
+              className="text-white bg-[#001b30] py-1 rounded-md hover:bg-[#001b30]/80 px-6"
               onClick={handleAddFloor}
             >
               Add
-            </button>
+            </button></div>
+            
           </div>
         </>
       )}
@@ -197,13 +327,32 @@ export default function Page() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
-            <input
-              type="text"
-              placeholder="SVG Path"
-              className="input text-black w-full mb-4"
-              value={svg_path}
-              onChange={(e) => setSvgPath(e.target.value)}
-            />
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Floor Image
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                className="file-input"
+                onChange={handleFileChange}
+              />
+              {uploadProgress > 0 && uploadProgress < 100 && (
+                <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                  <div
+                    className="bg-blue-600 h-2.5 rounded-full"
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+              )}
+              {previewUrl && (
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="mt-2 w-40 h-40 object-contain"
+                />
+              )}
+            </div>
             <div className="flex justify-end gap-2">
               <button
                 className="bg-gray-300 px-4 py-2 rounded"
@@ -212,14 +361,23 @@ export default function Page() {
                   setName("");
                   setShortName("");
                   setDescription("");
-                  setSvgPath("");
+                  setImageFile(null);
+                  setPreviewUrl(null);
                 }}
               >
                 Cancel
               </button>
               <button
                 className="bg-blue-600 text-white px-4 py-2 rounded"
-                onClick={handleUpdateFloor}
+                onClick={() => {
+                  handleUpdateFloor();
+                  setEditModalOpen(false);
+                  setName("");
+                  setShortName("");
+                  setDescription("");
+                  setImageFile(null);
+                  setPreviewUrl(null);
+                }}
               >
                 Save
               </button>
