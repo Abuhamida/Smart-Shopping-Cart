@@ -1,12 +1,8 @@
 import { supabase } from '@/app/lib/supabaseClient';
 import { NextResponse } from 'next/server';
 
-export const config = {
-  runtime: 'edge', // Optional: Consider edge runtime for file uploads
-  api: {
-    bodyParser: false, // Disable default body parsing
-  },
-};
+// ✅ New runtime export
+export const runtime = 'edge';
 
 export async function POST(request: Request) {
   try {
@@ -21,7 +17,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate file type
     const validTypes = ['image/jpeg', 'image/png', 'image/svg+xml'];
     if (!validTypes.includes(file.type)) {
       return NextResponse.json(
@@ -30,15 +25,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Generate unique filename
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
     const filePath = floorId ? `floor-${floorId}/${fileName}` : `temp/${fileName}`;
 
-    // Convert File to ArrayBuffer for Supabase upload
     const fileBuffer = await file.arrayBuffer();
 
-    // Upload to Supabase storage
     const { data, error } = await supabase.storage
       .from('maps')
       .upload(filePath, fileBuffer, {
@@ -55,15 +47,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('maps')
-      .getPublicUrl(filePath);
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('maps').getPublicUrl(filePath);
 
     return NextResponse.json({
       success: true,
       imageUrl: publicUrl,
-      filePath
+      filePath,
     });
 
   } catch (error) {
@@ -74,4 +65,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
