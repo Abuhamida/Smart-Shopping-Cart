@@ -73,14 +73,61 @@ export default function Page() {
   };
 
   const deleteImage = async (filePath: string) => {
-    const response = await fetch("/api/map/add/image", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ filePath }),
-    });
+    try {
+      // Extract just the path part if it's a full URL
+      const pathToDelete = filePath.includes('/maps/') 
+        ? filePath.split('/maps/')[1] 
+        : filePath;
+  
+      const response = await fetch("/api/map/delete/image", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filePath: pathToDelete }),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete image');
+      }
+  
+      return await response.json();
+    } catch (error) {
+      console.error("Error in deleteImage:", error);
+      throw error;
+    }
+  };
 
-    if (!response.ok) {
-      throw new Error("Failed to delete image");
+  const handleDelete = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this floor and its image?")) {
+      return;
+    }
+  
+    try {
+      // Find the floor to get its image path
+      const floorToDelete = floors.find((floor) => floor.id === id);
+      if (!floorToDelete) {
+        throw new Error("Floor not found");
+      }
+  
+      // Delete associated image if it exists
+      if (floorToDelete.svg_path) {
+        await deleteImage(floorToDelete.svg_path);
+      }
+  
+      // Delete floor record
+      const deleteResponse = await fetch(`/api/map/delete/floors?id=${id}`, {
+        method: "DELETE",
+      });
+  
+      if (!deleteResponse.ok) {
+        throw new Error("Failed to delete floor record");
+      }
+  
+      // Refresh the floor list
+      fetchFloors();
+    } catch (error) {
+      console.error("Error in handleDelete:", error);
+      alert(`Delete failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -171,24 +218,7 @@ export default function Page() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    // First delete the associated images
-    try {
-      const floorToDelete = floors.find((floor) => floor.id === id);
-      if (floorToDelete?.svg_path) {
-        const imagePath = floorToDelete.svg_path.split("/maps/")[1];
-        await deleteImage(imagePath);
-      }
-    } catch (error) {
-      console.error("Error deleting floor images:", error);
-    }
-
-    // Then delete the floor record
-    await fetch(`/api/map/delete/floors?id=${id}`, {
-      method: "DELETE",
-    });
-    fetchFloors();
-  };
+ 
 
   const openEditModal = (floor: FloorData) => {
     setSelectedFloor(floor);

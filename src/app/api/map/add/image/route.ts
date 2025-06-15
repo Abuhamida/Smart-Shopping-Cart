@@ -1,8 +1,8 @@
 import { supabase } from '@/app/lib/supabaseClient';
 import { NextResponse } from 'next/server';
 
-// ✅ New runtime export
-export const runtime = 'edge';
+// // ✅ New runtime export
+// export const runtime = 'edge';
 
 export async function POST(request: Request) {
   try {
